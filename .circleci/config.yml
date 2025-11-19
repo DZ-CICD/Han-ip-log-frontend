@@ -28,7 +28,7 @@ jobs:
           name: Build and Push Frontend Image to Harbor
           command: |
             # --- [설정] 프론트엔드 정보 ---
-            export IMAGE_NAME="haniplog-frontend"
+            export IMAGE_NAME="haniplog-backend"
             export HARBOR_PROJECT="haniplog"
             export HARBOR_DOMAIN="harbor.local.net"
             export IMAGE_TAG="v1.${CIRCLE_BUILD_NUM}"
