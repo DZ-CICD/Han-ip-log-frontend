@@ -64,7 +64,7 @@ workflows:
       - build-scan-and-push:
           # ★ 중요: 모든 비밀번호(Sonar, Harbor, Slack)가 들어있는 Context 연결
           context: 
-            - cicd-secrets # (만약 slack-secrets 등 다른 이름이면 수정 필요)
+            - slack-secrets # (만약 slack-secrets 등 다른 이름이면 수정 필요)
           filters:
             branches:
               only:
