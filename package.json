@@ -4,15 +4,17 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "node --inspect=9229 app.js "
+    "start": "node app.js"
   },
   "author": "Google Inc.",
   "license": "0BSD",
-  "devDependencies": {
+  "dependencies": {
     "axios": "^0.18.1",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
     "moment": "^2.24.0",
-    "pug": "^2.0.3"
+    "pug": "^2.0.3",
+    "http-proxy-middleware": "^2.0.6"
   }
 }
+
