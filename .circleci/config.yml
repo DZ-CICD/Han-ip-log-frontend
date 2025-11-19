@@ -1,0 +1,68 @@
+version: 2.1
+
+# -----------------
+# 1. ORBS (명령어 묶음)
+# -----------------
+orbs:
+  sonarcloud: sonarsource/sonarcloud@2.0
+  # --- ★★★ 수정 1: 슬랙 Orb 추가 ★★★ ---
+  slack: circleci/slack@4.12.5
+
+# ---------------
+# 2. JOBS
+# -----------------
+jobs:
+  build-scan-and-push:
+    machine:
+      resource_class: dz-cicd/vm-runner 
+    
+    steps:
+      - checkout
+
+      - sonarcloud/scan
+
+      - run:
+          name: Build and Push Docker Image to Harbor
+          command: |
+            export IMAGE_TAG="v1.${CIRCLE_BUILD_NUM}"
+            export HARBOR_DOMAIN="harbor.local.net" 
+            export HARBOR_PROJECT="haniplog"
+            export IMAGE_NAME="han-ip-log-app"
+            
+            export FULL_IMAGE_NAME="${HARBOR_DOMAIN}/${HARBOR_PROJECT}/${IMAGE_NAME}:${IMAGE_TAG}"
+
+            echo "Logging into Harbor..."
+            echo "$HARBOR_PASSWORD" | docker login -u "$HARBOR_USER" --password-stdin $HARBOR_DOMAIN
+            
+            echo "Building $FULL_IMAGE_NAME..."
+            docker build -t $FULL_IMAGE_NAME .
+            
+            echo "Pushing $FULL_IMAGE_NAME to Harbor..."
+            docker push $FULL_IMAGE_NAME
+      
+      # --- ★★★ 수정 2: 슬랙 알림 단계 추가 (맨 마지막) ★★★ ---
+      # 실패 시 알림
+      - slack/notify:
+          event: fail
+          template: basic_fail_1
+      
+      # 성공 시 알림
+      - slack/notify:
+          event: pass
+          template: basic_success_1
+
+# -----------------
+# 3. WORKFLOWS
+# -----------------
+workflows:
+  main_workflow:
+    jobs:
+      - build-scan-and-push:
+          # --- ★★★ 수정 3: Context 연결 ★★★ ---
+          # CircleCI 웹 UI에서 만든 Context 이름(slack-secrets)을 적어야 합니다.
+          context: 
+            - slack-secrets
+          filters:
+            branches:
+              only:
+                - main
