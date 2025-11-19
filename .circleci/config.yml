@@ -1,42 +1,44 @@
 version: 2.1
 
 # -----------------
-# 1. ORBS (도구 모음)
+# 1. ORBS
 # -----------------
 orbs:
   sonarcloud: sonarsource/sonarcloud@2.0
   slack: circleci/slack@4.12.5
 
 # -----------------
-# 2. JOBS (작업 정의)
+# 2. JOBS
 # -----------------
 jobs:
   build-scan-and-push:
-    # VM 러너 사용
     machine:
       resource_class: dz-cicd/vm-runner 
     
     steps:
-      # 1. 코드 가져오기
       - checkout
 
-      # 2. 소나큐브 스캔 (sonar-project.properties 파일 필수)
+      # SonarCloud 스캔
       - sonarcloud/scan
 
-      # 3. 도커 이미지 빌드 및 하버 푸시
+      # Docker 빌드 및 Harbor 푸시
       - run:
-          name: Build and Push Frontend Image to Harbor
+          name: Build and Push Frontend Image
           command: |
             # --- [설정] 프론트엔드 정보 ---
-            export IMAGE_NAME="haniplog-backend"
+            export IMAGE_NAME="haniplog-frontend"  # ◀◀ 수정됨
             export HARBOR_PROJECT="haniplog"
             export HARBOR_DOMAIN="harbor.local.net"
             export IMAGE_TAG="v1.${CIRCLE_BUILD_NUM}"
             
             export FULL_IMAGE_NAME="${HARBOR_DOMAIN}/${HARBOR_PROJECT}/${IMAGE_NAME}:${IMAGE_TAG}"
 
+            # 변수 전달
+            echo "export IMAGE_NAME=$IMAGE_NAME" >> $BASH_ENV
+            echo "export IMAGE_TAG=$IMAGE_TAG" >> $BASH_ENV
+            echo "export FULL_IMAGE_NAME=$FULL_IMAGE_NAME" >> $BASH_ENV
+
             echo "Logging into Harbor..."
-            # 환경변수($HARBOR_PASSWORD 등)는 CircleCI Context에서 가져옴
             echo "$HARBOR_PASSWORD" | docker login -u "$HARBOR_USER" --password-stdin $HARBOR_DOMAIN
             
             echo "Building $FULL_IMAGE_NAME..."
@@ -44,27 +46,62 @@ jobs:
             
             echo "Pushing $FULL_IMAGE_NAME to Harbor..."
             docker push $FULL_IMAGE_NAME
-      
-      # 4. 슬랙 알림 (실패 시)
+
+      # -------------------------------------------------------
+      # ★ Config Repo 업데이트 (ArgoCD 트리거)
+      # -------------------------------------------------------
+      - run:
+          name: Update Config Repo for Frontend
+          command: |
+            source $BASH_ENV
+
+            # Config Repo 주소
+            CONFIG_REPO_URL="https://${GITHUB_TOKEN}@github.com/DZ-CICD/Han-ip-log-config.git"
+            
+            TARGET_FILE="frontend.yaml"
+
+            echo "Cloning Config Repository..."
+            git clone $CONFIG_REPO_URL config_repo_temp
+            cd config_repo_temp
+
+            # Git 사용자 설정
+            git config user.email "circleci@haniplog.com"
+            git config user.name "CircleCI Bot"
+            
+            echo "Updating $TARGET_FILE with image: $FULL_IMAGE_NAME"
+            
+            # ★ 수정됨: sed 명령어가 'frontend'를 찾도록 변경
+            sed -i "s|image:.*frontend:.*|image: ${FULL_IMAGE_NAME}|g" $TARGET_FILE
+            
+            # 변경 내용 확인
+            echo "Modified content:"
+            cat $TARGET_FILE | grep "image:"
+            
+            # Git Push
+            git add $TARGET_FILE
+            # [skip ci] 필수
+            git commit -m "Update Frontend image to ${IMAGE_TAG} [skip ci]"
+            git push origin main
+
+      # 슬랙 알림 (실패)
       - slack/notify:
           event: fail
           template: basic_fail_1
       
-      # 5. 슬랙 알림 (성공 시)
+      # 슬랙 알림 (성공)
       - slack/notify:
           event: pass
           template: basic_success_1
 
 # -----------------
-# 3. WORKFLOWS (실행 흐름)
+# 3. WORKFLOWS
 # -----------------
 workflows:
-  frontend_workflow:
+  frontend_workflow: # ◀◀ 이름 변경 (선택사항이지만 추천)
     jobs:
       - build-scan-and-push:
-          # ★ 중요: 모든 비밀번호(Sonar, Harbor, Slack)가 들어있는 Context 연결
           context: 
-            - slack-secrets # (만약 slack-secrets 등 다른 이름이면 수정 필요)
+            - slack-secrets
           filters:
             branches:
               only:
