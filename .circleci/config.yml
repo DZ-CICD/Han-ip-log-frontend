@@ -58,7 +58,7 @@ jobs:
             # Config Repo 주소
             CONFIG_REPO_URL="https://${GITHUB_TOKEN}@github.com/DZ-CICD/Han-ip-log-config.git"
             
-            TARGET_FILE="frontend.yaml"
+            TARGET_FILE="frontend/frontend.yaml"
 
             echo "Cloning Config Repository..."
             git clone $CONFIG_REPO_URL config_repo_temp
