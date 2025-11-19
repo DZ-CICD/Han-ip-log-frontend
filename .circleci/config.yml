@@ -48,7 +48,7 @@ jobs:
             docker push $FULL_IMAGE_NAME
 
       # -------------------------------------------------------
-      # ★ Config Repo 업데이트 (ArgoCD 트리거)
+      # ★ Config Repo 업데이트
       # -------------------------------------------------------
       - run:
           name: Update Config Repo for Frontend
