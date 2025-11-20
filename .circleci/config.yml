@@ -18,7 +18,7 @@ jobs:
     steps:
       - checkout
       - sonarcloud/scan:
-          cache_version: 8  # 캐시 버전
+          cache_version: 8  # 캐시
 
       # - run:
       #     name: Check SonarCloud Quality Gate
