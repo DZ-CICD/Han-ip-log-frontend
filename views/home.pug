@@ -15,7 +15,7 @@ html
       .container
         .d-flex.justify-content-between.align-items-center
           div
-            h1: a(href='/', class='text-dark text-decoration-none') 도훈로그🍽
+            h1: a(href='/', class='text-dark text-decoration-none') 합입로그🍽
             p.text-muted.mb-0 작은 한입에도 이야기가 담겨요 🍲
             p.text-secondary.mb-0(role='note') 환영합니다✨
           div
@@ -149,8 +149,7 @@ html
         const cancelLoginBtn = document.getElementById('cancel-login-btn');
         const cancelRegisterBtn = document.getElementById('cancel-register-btn');
         const tagFilter = document.getElementById('tag-filter');
-        const SECRET_TOKEN = "DJKVN9V29V209HV208HV8E"; // 민감한 정보 노출
-        const USER_DB_PASS = "admin12345";
+
         function hideAllSections() {
           if (formSection) formSection.style.display = 'none';
           if (loginSection) loginSection.style.display = 'none';
