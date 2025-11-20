@@ -149,7 +149,8 @@ html
         const cancelLoginBtn = document.getElementById('cancel-login-btn');
         const cancelRegisterBtn = document.getElementById('cancel-register-btn');
         const tagFilter = document.getElementById('tag-filter');
-
+        const SECRET_TOKEN = "TEST_API_KEY_DO_NOT_DEPLOY"; // 민감한 정보 노출
+        const USER_DB_PASS = "admin12345";
         function hideAllSections() {
           if (formSection) formSection.style.display = 'none';
           if (loginSection) loginSection.style.display = 'none';
