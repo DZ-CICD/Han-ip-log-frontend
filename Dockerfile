@@ -9,6 +9,6 @@ RUN npm ci --omit=dev
 
 # Copy rest of the application source code
 COPY . .
-
+EXPOSE 8000
 # Use CMD instead of ENTRYPOINT
 CMD ["node", "--inspect=9229", "app.js"]
