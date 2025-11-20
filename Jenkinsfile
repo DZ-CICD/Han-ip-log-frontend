@@ -49,7 +49,7 @@ pipeline {
                     echo "Starting Trivy scan on ${IMAGE_TAG}..."
                     
                     // --exit-code 1 플래그를 제거했습니다. 취약점이 나와도 빌드는 성공합니다.
-                    sh "trivy image --severity CRITICAL,HIGH ${IMAGE_TAG}" 
+                    sh "trivy image --severity CRITICAL,HIGH --skip-tls-verify ${IMAGE_TAG}" 
                     
                     echo "--- Trivy Scan Complete. Continuing pipeline. ---"
                 }
