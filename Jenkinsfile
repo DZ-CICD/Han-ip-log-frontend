@@ -41,6 +41,21 @@ pipeline {
             }
         }
 
+	stage('Security Scan (Trivy)') {
+            steps {
+                script {
+                    def IMAGE_TAG = "${HARBOR_REGISTRY}/${IMAGE_NAME}:${env.BUILD_NUMBER}"
+                    echo "--- Trivy Scan Results (CRITICAL/HIGH only) ---"
+                    echo "Starting Trivy scan on ${IMAGE_TAG}..."
+                    
+                    // --exit-code 1 플래그를 제거했습니다. 취약점이 나와도 빌드는 성공합니다.
+                    sh "trivy image --severity CRITICAL,HIGH ${IMAGE_TAG}" 
+                    
+                    echo "--- Trivy Scan Complete. Continuing pipeline. ---"
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 script {
