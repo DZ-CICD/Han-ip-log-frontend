@@ -6,8 +6,11 @@ WORKDIR /app
 # package.json & package-lock.json 복사
 COPY package*.json ./
 
-# 종속성 설치
-RUN npm ci --omit=dev
+# 👇 추가: npm 캐시를 완전히 비워 빌드 캐시 오염을 막습니다.
+RUN npm cache clean --force
+
+# 👇 수정: npm ci 대신 npm install을 사용합니다.
+RUN npm install --omit=dev
 
 # 앱 소스 코드 복사
 COPY . .

@@ -16,6 +16,13 @@ pipeline {
     }
 
     stages {
+        // 👇 추가: 작업 공간을 깨끗하게 초기화합니다.
+        stage('Clean Workspace') {
+            steps {
+                cleanWs() 
+            }
+        }
+        
         // 1. 소스 코드 가져오기
         stage('Checkout') {
             steps {
@@ -39,8 +46,6 @@ pipeline {
                         -Dsonar.host.url=https://sonarcloud.io
                         """
                     }
-                    // 참고: 품질 게이트(Quality Gate) 실패 시 빌드를 멈추려면
-                    // withSonarQubeEnv 블록 뒤에 waitForQualityGate()를 추가해야 합니다.
                 }
             }
         }
@@ -54,8 +59,7 @@ pipeline {
                     echo "Building Frontend Docker Image..."
                     
                     // A. 이미지 빌드 (sh 스텝으로 docker build 직접 실행)
-                    // --pull --no-cache 옵션을 사용하여 캐시를 무효화하고 항상 최신 의존성으로 빌드합니다.
-                    sh "docker build -t ${IMAGE_TAG} --pull --no-cache ."
+                    sh "docker build -t ${IMAGE_TAG} --pull --no-cache ." // --no-cache는 유지됩니다.
 
                     // B. Trivy 보안 검사 (Build 직후, Fail Fast 적용)
                     echo "--- Trivy Scan Started (CRITICAL/HIGH only) ---"
@@ -63,12 +67,11 @@ pipeline {
                     echo "--- Trivy Scan Complete. ---"
 
                     // C. Harbor Push (검사 통과 후 푸시)
-                    // docker.withRegistry와 customImage.push() 대신 sh 스텝을 사용하여 로그인 및 푸시를 수행합니다.
                     withCredentials([usernamePassword(credentialsId: HARBOR_CREDENTIALS_ID, passwordVariable: 'HARBOR_PASSWORD', usernameVariable: 'HARBOR_USER')]) {
                         sh "docker login ${HARBOR_REGISTRY} -u ${HARBOR_USER} -p ${HARBOR_PASSWORD}"
                         echo "Pushing Image to Harbor..."
                         sh "docker push ${IMAGE_TAG}"
-                        sh "docker tag ${IMAGE_TAG} ${HARBOR_REGISTRY}/${IMAGE_NAME}:latest" // latest 태그도 푸시
+                        sh "docker tag ${IMAGE_TAG} ${HARBOR_REGISTRY}/${IMAGE_NAME}:latest"
                         sh "docker push ${HARBOR_REGISTRY}/${IMAGE_NAME}:latest"
                         sh "docker logout ${HARBOR_REGISTRY}"
                     }
