@@ -51,8 +51,11 @@ pipeline {
                 script {
                     echo "Building Frontend Docker Image..."
                     // A. 이미지 빌드 (로컬에 생성)
-                    // 👇 캐시를 무효화하는 옵션("--pull --no-cache")을 추가하여 의존성을 강제로 재설치하고 취약점 문제를 해결합니다.
-                    def customImage = docker.build("${HARBOR_REGISTRY}/${IMAGE_NAME}:${env.BUILD_NUMBER}", "--pull --no-cache")
+                    // 👇 빌드 오류를 해결하고 캐시를 무효화하는 옵션을 arguments 파라미터로 전달했습니다.
+                    def customImage = docker.build(
+                        "${HARBOR_REGISTRY}/${IMAGE_NAME}:${env.BUILD_NUMBER}",
+                        arguments: "--pull --no-cache ."
+                    )
                     def IMAGE_TAG = "${HARBOR_REGISTRY}/${IMAGE_NAME}:${env.BUILD_NUMBER}"
 
                     // B. Trivy 보안 검사 (Build 직후, Fail Fast 적용)
