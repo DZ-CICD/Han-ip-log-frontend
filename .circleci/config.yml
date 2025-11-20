@@ -16,8 +16,23 @@ jobs:
       resource_class: dz-cicd/vm-runner 
     
     steps:
-      - checkout
-      # SonarCloud 스캔
+      # --- ★★★ Git Clone을 수동으로 수행하여 히스토리 깊이를 확보 ★★★ ---
+      - run:
+          name: Full Git Clone for SCM Analysis
+          command: |
+            # 1. 기존 작업 환경 정리 (러너가 쓰는 workdir 폴더)
+            cd /var/lib/circleci-runner/workdir/
+            rm -rf * .git .circleci 2>/dev/null || true
+            
+            # 2. 전체 히스토리를 가져오는 깊은 클론(depth 0) 실행
+            #    (CircleCI가 자동으로 제공하는 환경 변수 사용)
+            git clone --branch $CIRCLE_BRANCH --depth 0 $CIRCLE_REPOSITORY_URL .
+            
+            # 3. Git 태그도 모두 가져와서 분석을 위한 데이터 완성
+            git fetch --tags
+            
+            # 4. 마지막 커밋 체크아웃
+            git reset --hard $CIRCLE_SHA1
       - sonarcloud/scan
 
       # Docker 빌드 및 Harbor 푸시
