@@ -1,0 +1,21 @@
+// frontend/views/winners.pug (당첨자 발표 팝업 페이지)
+
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    title 당첨자 명단
+    style.
+      body { font-family: sans-serif; background-color: #f0f0f0; padding: 30px; text-align: center; }
+      h1 { color: #00bcd4; }
+      ul { list-style: none; padding: 0; }
+      li { background: white; margin: 10px 0; padding: 15px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-weight: bold; }
+  body
+    h1 🌟 리뷰 이벤트 당첨자 명단 🌟
+    p 축하드립니다! 다음 분들이 당첨되셨습니다.
+    ul#winnerList
+      li 강우석 (최우수 리뷰상)
+      li 조하나 (아이디어상)
+      li 장예라 (참가상)
+    
+    button(onclick='window.close()', style='margin-top: 20px; padding: 10px 20px; cursor: pointer;') 팝업 닫기

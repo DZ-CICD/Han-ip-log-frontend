@@ -1,4 +1,4 @@
-// frontend/views/home.pug (최종 방탄 코드)
+// frontend/views/home.pug (당첨자 배너 기능 최종 추가)
 
 doctype html
 html
@@ -8,6 +8,36 @@ html
     meta(name='viewport', content='width=device-width, initial-scale=1')
     link(rel='stylesheet', href='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css')
     link(rel='stylesheet', href='/css/style.css')
+    style.
+      .winner-banner {
+        background-color: #e0f7fa;
+        border: 2px solid #00bcd4;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        text-align: center;
+        font-size: 1.1em;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      }
+      .winner-button {
+        padding: 8px 15px;
+        margin-left: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+      .check-btn {
+        background-color: #00bcd4;
+        color: white;
+      }
+      .close-btn {
+        background-color: #f44336;
+        color: white;
+      }
   body
     - const allTags = [{emoji: '👥', label: '단체석'}, {emoji: '🪑', label: '입식'}, {emoji: '🧑‍🍳', label: '특별한메뉴'}, {emoji: '🛋️', label: '인테리어'}, {emoji: '🌿', label: '신선한'}, {emoji: '💕', label: '데이트'}, {emoji: '👀', label: '넓은'}, {emoji: '👥', label: '회식'}, {emoji: '🗣️', label: '대화'}, {emoji: '🍙', label: '혼밥'}, {emoji: '👨‍👩‍👧‍👦', label: '가족모임'}, {emoji: '✨', label: '분위기좋은'}, {emoji: '🆕', label: '새로오픈'}]
 
@@ -15,16 +45,25 @@ html
       .container
         .d-flex.justify-content-between.align-items-center
           div
-            h1: a(href='/', class='text-dark text-decoration-none') 🍲두입로그🍽
+            h1: a(href='/', class='text-dark text-decoration-none') 🍲한입로그🍽
             p.text-muted.mb-0 작은 한입에도 이야기가 담겨요 🍲
             p.text-secondary.mb-0(role='note') 환영합니다✨
           div
             #auth-links
               button.btn.btn-outline-primary.btn-sm.mr-2#login-btn 로그인
-              button.btn.btn-outline-secondary.btn-sm#register-btn 회원가입
+              button.btn.outline-secondary.btn-sm#register-btn 회원가입
             #user-info(style="display: none;")
               span#welcome-msg.text-muted.mr-3
               button.btn.btn-danger.btn-sm#logout-btn 로그아웃
+
+    // ------------------------- [새 배너 추가 시작] -------------------------
+    #winner-banner-section.container.mb-3
+      .winner-banner.bg-info.p-3.rounded.d-flex.justify-content-between.align-items-center
+        span.text-white.font-weight-bold ✨ 🎉 11.21일 우수 로그 당첨자 발표! 🎉 ✨
+        div
+          button.btn.btn-success.btn-sm.mr-2#check-winner-btn 당첨자 확인
+          button.btn.btn-secondary.btn-sm#close-banner-btn 닫기
+    // -------------------------- [새 배너 추가 끝] --------------------------
 
     #login-form-section.container.mb-5(style="display: none;")
       h3.mb-4.text-primary 🔒 로그인
@@ -141,6 +180,8 @@ html
         const userInfo = document.getElementById('user-info');
         const welcomeMsg = document.getElementById('welcome-msg');
         
+        const checkWinnerBtn = document.getElementById('check-winner-btn'); // ⬅️ (2) 버튼 요소 가져옴
+
         const showButton = document.getElementById('show-form-btn');
         const hideButton = document.getElementById('hide-form-btn');
         const loginButton = document.getElementById('login-btn');
@@ -149,6 +190,22 @@ html
         const cancelLoginBtn = document.getElementById('cancel-login-btn');
         const cancelRegisterBtn = document.getElementById('cancel-register-btn');
         const tagFilter = document.getElementById('tag-filter');
+
+        // ------------------------- [새 JS 함수 바인딩] -------------------------
+        // 기존 openWinnerPage 함수 정의는 삭제했습니다.
+        
+        if (checkWinnerBtn) {
+            checkWinnerBtn.addEventListener('click', () => { // ⬅️ (3) 버튼 클릭 시 팝업 창 열기 로직 직접 바인딩
+                window.open('/winners', 'WinnerPopup', 'width=600,height=400');
+            });
+        }
+
+        if (document.getElementById('close-banner-btn')) {
+            document.getElementById('close-banner-btn').addEventListener('click', () => {
+                document.getElementById('winner-banner-section').style.display = 'none';
+            });
+        }
+        // -------------------------- [JS 함수 바인딩 끝] --------------------------
 
         function hideAllSections() {
           if (formSection) formSection.style.display = 'none';
@@ -176,7 +233,7 @@ html
         function updateVisibility() {
           const path = window.location.pathname;
           hideAllSections(); // 🟢 일단 모든 것을 기본 상태(목록)로 리셋
-          
+
           if (path === '/reviews/new') {
             if (formSection) formSection.style.display = 'block';
             if (header) header.style.display = 'none';
@@ -250,7 +307,7 @@ html
             window.location.href = selectedTag ? `/?tag=${selectedTag}` : '/';
           });
         }
-        
+
         window.addEventListener('popstate', updateVisibility);
         checkLoginState();
       });

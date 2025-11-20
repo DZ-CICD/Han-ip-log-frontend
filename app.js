@@ -72,6 +72,13 @@ app.get('/reviews/new', renderHomePage);
 app.get('/login', renderHomePage);
 app.get('/register', renderHomePage);
 
+// 🌟🌟🌟 추가된 부분: 당첨자 페이지 라우트 🌟🌟🌟
+app.get('/winners', (req, res) => {
+    // '/winners' 요청이 들어오면 views/winners.pug 파일을 렌더링합니다.
+    res.render('winners');
+});
+// 🌟🌟🌟 추가된 부분 끝 🌟🌟🌟
+
 // '리뷰 수정' 페이지
 app.get('/reviews/:id/edit', async (req, res) => {
     try {
