@@ -18,7 +18,7 @@ spec:
       - name: frontend
 
         # 초기에는 이렇게 적어두면 Jenkins가 알아서 :1.7, :1.8 등으로 바꿉니다.
-        image: 192.168.0.183/haniplogjenkins/han-ip-log-frontend:18
+        image: 192.168.0.183/haniplogjenkins/han-ip-log-frontend:36
         ports:
         - containerPort: 8000 # [정답] 여기 8000 맞습니다!
         env:
