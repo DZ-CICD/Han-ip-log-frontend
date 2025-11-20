@@ -16,9 +16,8 @@ jobs:
       - image: cimg/node:20.15  # Sonar + Docker client 설치됨
     steps:
       - checkout
-    
-    steps:
-      - checkout
+      - setup_remote_docker:
+          version: 24.0.1    
 
       # SonarCloud 스캔
       - sonarcloud/scan
