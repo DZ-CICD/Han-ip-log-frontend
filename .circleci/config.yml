@@ -12,11 +12,12 @@ orbs:
 # -----------------
 jobs:
   build-scan-and-push:
-    machine:
-      resource_class: dz-cicd/vm-runner 
-    
+    docker:
+      - image: cimg/node:20.15
     steps:
       - checkout
+
+      - setup_remote_docker  # <<<<< 버전 제거!
 
       # SonarCloud 스캔
       - sonarcloud/scan
