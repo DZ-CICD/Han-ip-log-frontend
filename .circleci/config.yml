@@ -12,8 +12,10 @@ orbs:
 # -----------------
 jobs:
   build-scan-and-push:
-    machine:
-      resource_class: dz-cicd/vm-runner 
+    docker:
+      - image: cimg/base:stable   # ★ machine → docker 변경됨 (초기화 5초 수준)
+    services:
+      - docker                    # ★ Docker Daemon 활성화 (Docker build 가능)
     
     steps:
       - checkout
