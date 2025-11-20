@@ -20,7 +20,7 @@ jobs:
 
       # SonarCloud 스캔
       - sonarcloud/scan
-
+      - sonarcloud/wait-for-quality-gate
       # Docker 빌드 및 Harbor 푸시
       - run:
           name: Build and Push Frontend Image
