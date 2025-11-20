@@ -1,21 +1,24 @@
 {
   "name": "frontend",
   "version": "1.0.0",
-  "description": "",
-  "main": "app.js",
-  "scripts": {
-    "start": "node app.js"
-  },
-  "author": "Google Inc.",
-  "license": "0BSD",
   "dependencies": {
     "axios": "^0.30.2",
     "body-parser": "^1.18.3",
-    "cross-spawn": "^7.0.5",
+    "cross-spawn": "7.0.6",
     "express": "^4.16.4",
-    "glob": "^10.5.0",
+    "glob": "11.1.0",
     "http-proxy-middleware": "^2.0.6",
     "moment": "^2.24.0",
     "pug": "^3.0.3"
+  },
+  "overrides": {
+    "cross-spawn": "7.0.6",
+    "glob": "11.1.0",
+    "rimraf": {
+        "glob": "11.1.0"
+    },
+    "inflight": {
+         "glob": "11.1.0"
+    }
   }
 }
