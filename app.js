@@ -14,7 +14,6 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 app.use(express.static(path.join(__dirname, 'public')));
 
-// --- API 프록시 설정 ---
 
 // 1. "인증" API (로그인, 회원가입)
 // 이 요청들은 /api가 없으므로, 백엔드에 그대로 전달합니다.
