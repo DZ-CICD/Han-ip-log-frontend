@@ -20,8 +20,10 @@ jobs:
 
       # SonarCloud 스캔
       - sonarcloud/scan
-      - sonarcloud/wait-for-quality-gate
-      # Docker 빌드 및 Harbor 푸시
+      - sonarcloud/check-quality-gate:
+          fail-on-error: true # Quality Gate 실패 시 빌드 중단 (필수)      # Docker 빌드 및 Harbor 푸시
+
+
       - run:
           name: Build and Push Frontend Image
           command: |
