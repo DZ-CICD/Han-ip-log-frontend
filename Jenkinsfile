@@ -19,7 +19,9 @@ pipeline {
         // 👇 추가: 작업 공간을 깨끗하게 초기화합니다.
         stage('Clean Workspace') {
             steps {
-                cleanWs() 
+		echo "Removing dangling Docker images and build cache..."
+                // 사용되지 않는 모든 Docker 이미지, 컨테이너, 볼륨, 네트워크 강제 삭제
+                sh "docker system prune -f --all"
             }
         }
         
