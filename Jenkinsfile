@@ -49,26 +49,28 @@ pipeline {
         stage('Build & Security Scan') {
             steps {
                 script {
-                    echo "Building Frontend Docker Image..."
-                    // A. 이미지 빌드 (로컬에 생성)
-                    // 👇 빌드 오류를 해결하고 캐시를 무효화하는 옵션을 arguments 파라미터로 전달했습니다.
-                    def customImage = docker.build(
-                        "${HARBOR_REGISTRY}/${IMAGE_NAME}:${env.BUILD_NUMBER}",
-                        arguments: "--pull --no-cache ."
-                    )
                     def IMAGE_TAG = "${HARBOR_REGISTRY}/${IMAGE_NAME}:${env.BUILD_NUMBER}"
+                    
+                    echo "Building Frontend Docker Image..."
+                    
+                    // A. 이미지 빌드 (sh 스텝으로 docker build 직접 실행)
+                    // --pull --no-cache 옵션을 사용하여 캐시를 무효화하고 항상 최신 의존성으로 빌드합니다.
+                    sh "docker build -t ${IMAGE_TAG} --pull --no-cache ."
 
                     // B. Trivy 보안 검사 (Build 직후, Fail Fast 적용)
                     echo "--- Trivy Scan Started (CRITICAL/HIGH only) ---"
-                    // --exit-code 1 옵션을 넣으면 HIGH/CRITICAL 발견 시 여기서 파이프라인 실패
                     sh "trivy image --severity CRITICAL,HIGH --exit-code 1 --insecure ${IMAGE_TAG}"
                     echo "--- Trivy Scan Complete. ---"
 
                     // C. Harbor Push (검사 통과 후 푸시)
-                    docker.withRegistry("http://${HARBOR_REGISTRY}", "${HARBOR_CREDENTIALS_ID}") {
+                    // docker.withRegistry와 customImage.push() 대신 sh 스텝을 사용하여 로그인 및 푸시를 수행합니다.
+                    withCredentials([usernamePassword(credentialsId: HARBOR_CREDENTIALS_ID, passwordVariable: 'HARBOR_PASSWORD', usernameVariable: 'HARBOR_USER')]) {
+                        sh "docker login ${HARBOR_REGISTRY} -u ${HARBOR_USER} -p ${HARBOR_PASSWORD}"
                         echo "Pushing Image to Harbor..."
-                        customImage.push()
-                        customImage.push('latest')
+                        sh "docker push ${IMAGE_TAG}"
+                        sh "docker tag ${IMAGE_TAG} ${HARBOR_REGISTRY}/${IMAGE_NAME}:latest" // latest 태그도 푸시
+                        sh "docker push ${HARBOR_REGISTRY}/${IMAGE_NAME}:latest"
+                        sh "docker logout ${HARBOR_REGISTRY}"
                     }
                 }
             }
