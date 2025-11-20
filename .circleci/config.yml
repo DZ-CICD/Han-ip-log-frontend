@@ -16,8 +16,8 @@ jobs:
       resource_class: dz-cicd/vm-runner 
     
     steps:
-      - checkout
-
+      - checkout:
+          fetch-depth: 0
       # SonarCloud 스캔
       - sonarcloud/scan
 
