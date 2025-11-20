@@ -65,7 +65,7 @@ pipeline {
 
                     // B. Trivy 보안 검사 (Build 직후, Fail Fast 적용)
                     echo "--- Trivy Scan Started (CRITICAL/HIGH only) ---"
-                    sh "trivy image --severity CRITICAL,HIGH --exit-code 1 --insecure ${IMAGE_TAG}"
+		    sh "trivy image --clear-cache --severity CRITICAL,HIGH --exit-code 1 --insecure ${IMAGE_TAG}"
                     echo "--- Trivy Scan Complete. ---"
 
                     // C. Harbor Push (검사 통과 후 푸시)
