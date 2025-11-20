@@ -16,10 +16,9 @@ jobs:
       resource_class: dz-cicd/vm-runner 
     
     steps:
-      # --- ★★★ Git Clone을 수동으로 수행하여 히스토리 깊이를 확보 ★★★ ---
-      - checkout:
-          # Git 히스토리 부족 문제를 해결하는 표준 설정
-          fetch-depth: 0
+      - checkout
+
+      # SonarCloud 스캔
       - sonarcloud/scan
 
       # Docker 빌드 및 Harbor 푸시
@@ -106,4 +105,4 @@ workflows:
           filters:
             branches:
               only:
-                - main 
+                - main
