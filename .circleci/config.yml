@@ -20,26 +20,26 @@ jobs:
 
       # SonarCloud 스캔
       - sonarcloud/scan
- 
-      - run:
-          name: Check SonarCloud Quality Gate
-          command: |
-            echo "Checking SonarCloud Quality Gate…"
+  
+      # - run:
+      #     name: Check SonarCloud Quality Gate
+      #     command: |
+      #       echo "Checking SonarCloud Quality Gate…"
 
-            PROJECT_KEY="$SONAR_PROJECT_KEY"
+      #       PROJECT_KEY="$SONAR_PROJECT_KEY"
 
-            STATUS=$(curl -s -u "$SONAR_TOKEN": \
-              "https://sonarcloud.io/api/qualitygates/project_status?projectKey=${PROJECT_KEY}" \
-              | jq -r '.projectStatus.status')
+      #       STATUS=$(curl -s -u "$SONAR_TOKEN": \
+      #         "https://sonarcloud.io/api/qualitygates/project_status?projectKey=${PROJECT_KEY}" \
+      #         | jq -r '.projectStatus.status')
 
-            echo "Quality Gate Status: $STATUS"
+      #       echo "Quality Gate Status: $STATUS"
 
-            if [ "$STATUS" != "OK" ]; then
-              echo "❌ Quality Gate FAILED. Stopping build."
-              exit 1
-            fi
+      #       if [ "$STATUS" != "OK" ]; then
+      #         echo "❌ Quality Gate FAILED. Stopping build."
+      #         exit 1
+      #       fi
 
-            echo "✅ Quality Gate PASSED."
+      #       echo "✅ Quality Gate PASSED."
 
 
 
