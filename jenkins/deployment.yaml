@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: frontend-ns
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      terminationGracePeriodSeconds: 5
+      containers:
+      - name: frontend
+        # [Jenkins가 바꿀 부분]
+        # 초기에는 이렇게 적어두면 Jenkins가 알아서 :1.7, :1.8 등으로 바꿉니다.
+        image: 192.168.0.183/haniplogjenkins/han-ip-log-frontend:latest 
+        ports:
+        - containerPort: 8000 # [정답] 여기 8000 맞습니다!
+        env:
+        - name: PORT
+          value: "8000"
+        - name: GUESTBOOK_API_ADDR
+          valueFrom:
+            configMapKeyRef:
+              name: frontend-config
+              key: GUESTBOOK_API_ADDR
