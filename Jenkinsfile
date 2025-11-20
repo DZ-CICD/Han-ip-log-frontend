@@ -51,15 +51,16 @@ pipeline {
                 script {
                     echo "Building Frontend Docker Image..."
                     // A. 이미지 빌드 (로컬에 생성)
-                    def customImage = docker.build("${HARBOR_REGISTRY}/${IMAGE_NAME}:${env.BUILD_NUMBER}")
+                    // 👇 캐시를 무효화하는 옵션("--pull --no-cache")을 추가하여 의존성을 강제로 재설치하고 취약점 문제를 해결합니다.
+                    def customImage = docker.build("${HARBOR_REGISTRY}/${IMAGE_NAME}:${env.BUILD_NUMBER}", "--pull --no-cache")
                     def IMAGE_TAG = "${HARBOR_REGISTRY}/${IMAGE_NAME}:${env.BUILD_NUMBER}"
-                    
+
                     // B. Trivy 보안 검사 (Build 직후, Fail Fast 적용)
                     echo "--- Trivy Scan Started (CRITICAL/HIGH only) ---"
                     // --exit-code 1 옵션을 넣으면 HIGH/CRITICAL 발견 시 여기서 파이프라인 실패
-                    sh "trivy image --severity CRITICAL,HIGH --exit-code 1 ${IMAGE_TAG}" 
+                    sh "trivy image --severity CRITICAL,HIGH --exit-code 1 --insecure ${IMAGE_TAG}"
                     echo "--- Trivy Scan Complete. ---"
-                    
+
                     // C. Harbor Push (검사 통과 후 푸시)
                     docker.withRegistry("http://${HARBOR_REGISTRY}", "${HARBOR_CREDENTIALS_ID}") {
                         echo "Pushing Image to Harbor..."
