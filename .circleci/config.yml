@@ -12,12 +12,11 @@ orbs:
 # -----------------
 jobs:
   build-scan-and-push:
-    docker:
-      - image: cimg/node:20.15  # Sonar + Docker client 설치됨
+    machine:
+      resource_class: dz-cicd/vm-runner 
+    
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 24.0.1    
 
       # SonarCloud 스캔
       - sonarcloud/scan
@@ -106,4 +105,4 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - main 
